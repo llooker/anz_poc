@@ -1,5 +1,13 @@
 view: account {
   sql_table_name: anz_poc.wh_denormalised ;;
+
+#############CONTROL##################
+  dimension_group: reporting_day {
+    type: time
+    timeframes: [year, quarter, month, date]
+    sql: TIMESTAMP(${TABLE}.control.reporting_day) ;;
+  }
+
 #############ACCOUNT##################
   dimension: entity {
     group_label: "Account"
