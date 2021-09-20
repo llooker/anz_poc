@@ -83,6 +83,41 @@ view: account {
     group_label: "Account"
     type: sum
     sql: ${account_balance} ;;
+    value_format_name: usd_0
+    drill_fields: [account_number, account_status, interest_rate_type, total_account_balance]
+    action: {
+      label: "Suggest Adjustment"
+      url: "https://hooks.zapier.com/hooks/catch/2813548/oosxkej/"
+
+      form_param: {
+        name: "Name"
+        type: string
+        default: "{{ _user_attributes.first_name}} {{ _user_attributes.last_name}}"
+      }
+
+      form_param: {
+        name: "Email"
+        type: string
+        default: "{{ _user_attributes.email }}"
+      }
+
+      form_param: {
+        name: "Old Value"
+        type: string
+        default: "{{ total_account_balance._value }}"
+      }
+
+      form_param: {
+        name: "Suggested New Value"
+        type: string
+      }
+
+      form_param: {
+        name: "Comments"
+        type: textarea
+        default: " Hi, I believe exposure for Account Number {{account_number._value }} should be adjusted due to a manual adjustment in our trades as a result of a market adjustment on January 13th. See memo XYZ for more details."
+      }
+    }
   }
   measure: delinquent_90 {
     group_label: "Account"
