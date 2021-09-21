@@ -27,12 +27,54 @@ view: account {
     group_label: "Account"
     type:number
     sql: ${TABLE}.account.account_balance ;;
+    value_format_name: usd_0
+
+    action: {
+      label: "Suggest Adjustment"
+      url: "https://hooks.zapier.com/hooks/catch/2813548/oosxkej/"
+
+      form_param: {
+        name: "Name"
+        type: string
+        default: "{{ _user_attributes.first_name}} {{ _user_attributes.last_name}}"
+      }
+
+      form_param: {
+        name: "Email"
+        type: string
+        default: "{{ _user_attributes.email }}"
+      }
+
+      form_param: {
+        name: "Old Value"
+        type: string
+        default: "{{ total_account_balance._value }}"
+      }
+
+      form_param: {
+        name: "Suggested New Value"
+        type: string
+      }
+
+      form_param: {
+        name: "Comments"
+        type: textarea
+        default: " Hi, I believe exposure for Account Number {{account_number._value }} should be adjusted due to a manual adjustment in our trades as a result of a market adjustment on January 13th. See memo XYZ for more details."
+      }
+    }
   }
   dimension: days_delinquent {
     group_label: "Account"
     type: number
     sql: ${TABLE}.account.days_delinquent;;
   }
+  dimension: days_delinquent_tier {
+    group_label: "Account"
+    type: tier
+    tiers: [15,30,45,60,90,120]
+    sql: ${days_delinquent} ;;
+  }
+
   dimension: dpd_banding_extended {
     group_label: "Account"
     type:number
@@ -86,40 +128,8 @@ view: account {
     type: sum
     sql: ${account_balance} ;;
     value_format_name: usd_0
-    drill_fields: [account_number, account_status, interest_rate_type, total_account_balance]
-    action: {
-      label: "Suggest Adjustment"
-      url: "https://hooks.zapier.com/hooks/catch/2813548/oosxkej/"
+    drill_fields: [account_details*]
 
-      form_param: {
-        name: "Name"
-        type: string
-        default: "{{ _user_attributes.first_name}} {{ _user_attributes.last_name}}"
-      }
-
-      form_param: {
-        name: "Email"
-        type: string
-        default: "{{ _user_attributes.email }}"
-      }
-
-      form_param: {
-        name: "Old Value"
-        type: string
-        default: "{{ total_account_balance._value }}"
-      }
-
-      form_param: {
-        name: "Suggested New Value"
-        type: string
-      }
-
-      form_param: {
-        name: "Comments"
-        type: textarea
-        default: " Hi, I believe exposure for Account Number {{account_number._value }} should be adjusted due to a manual adjustment in our trades as a result of a market adjustment on January 13th. See memo XYZ for more details."
-      }
-    }
   }
   measure: delinquent_90 {
     group_label: "Account"
@@ -127,8 +137,59 @@ view: account {
     filters: [days_delinquent: ">=90"]
   }
   measure: count {
+    label: "Total Accounts"
     group_label: "Account"
-    type:count
+    type:count_distinct
+    sql: ${account_number} ;;
+    drill_fields: [account_details*]
+  }
+
+  parameter: delinquency_threshold {
+    description: "Select # of days deliquent to calculate delinquency rate dynamically; defaults to 90 days"
+    type: number
+    default_value: "90"
+    allowed_value: {
+      label: "30-Day Deliquency"
+      value: "30"
+    }
+    allowed_value: {
+      label: "45-Day Deliquency"
+      value: "45"
+    }
+    allowed_value: {
+      label: "60-Day Deliquency"
+      value: "60"
+    }
+    allowed_value: {
+      label: "90-Day Deliquency"
+      value: "90"
+    }
+  }
+
+  dimension: is_delinquent {
+    group_label: "Account"
+    description: "Use with Deliquency Threshold paramter to dynamically calculate deliquency rate"
+    type: yesno
+    sql: ${days_delinquent} >= {% parameter delinquency_threshold %};;
+  }
+
+  measure: dynamic_delinquent_total {
+    label: "Total Delinquencies"
+    group_label: "Account"
+    description: "Use with Deliquency Threshold paramter to dynamically calculate deliquency rate"
+    type: count
+    filters: [is_delinquent: "Yes"]
+    drill_fields: [account_details*]
+  }
+
+  measure: dynamic_delinquency_rate {
+    group_label: "Account"
+    description: "Use with Deliquency Threshold paramter to dynamically calculate deliquency rate"
+    label_from_parameter: delinquency_threshold
+    type:number
+    sql: 1.0*${dynamic_delinquent_total} / nullif(${count},0) ;;
+    value_format_name: percent_2
+    drill_fields: [state, count, dynamic_delinquency_rate]
   }
 
 #############PRODUCT##################
@@ -214,4 +275,11 @@ view: account {
     group_label: "Planning"
     sql: ${TABLE}.planning.GLA ;;
   }
+
+  ## SETS ##
+
+  set: account_details {
+    fields: [account_number, account_status, interest_rate_type, account_balance]
+  }
+
 }
