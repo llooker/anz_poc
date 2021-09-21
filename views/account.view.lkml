@@ -3,6 +3,7 @@ view: account {
 
 #############CONTROL##################
 
+
   dimension_group: reporting_day {
     type: time
     timeframes: [year, quarter, month, date]
