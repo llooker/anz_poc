@@ -18,6 +18,19 @@ view: account {
   dimension: account_number {
     group_label: "Account"
     sql: ${TABLE}.account.account_number ;;
+
+    link: {
+      label: "Link to Account"
+      url: "https://www.anz.com.au"
+      icon_url: "http://www.google.com/s2/favicons?domain=anz.com.au"
+    }
+
+    link: {
+      label: "View Account History"
+      url: "/dashboards-next/1007?Account%20Number={{value}}"
+      icon_url: "http://www.google.com/s2/favicons?domain=looker.com"
+    }
+
   }
   dimension: account_status {
     group_label: "Account"
@@ -32,6 +45,8 @@ view: account {
     action: {
       label: "Suggest Adjustment"
       url: "https://hooks.zapier.com/hooks/catch/2813548/oosxkej/"
+      icon_url: "http://www.google.com/s2/favicons?domain=anz.com.au"
+      #^sample of sending to server with custom form that can accept JSON POST
 
       form_param: {
         name: "Name"
@@ -48,7 +63,7 @@ view: account {
       form_param: {
         name: "Old Value"
         type: string
-        default: "{{ total_account_balance._value }}"
+        default: "{{ total_account_balance._rendered_value }}"
       }
 
       form_param: {
@@ -102,6 +117,7 @@ view: account {
   dimension: state {
     group_label: "Account"
     sql: ${TABLE}.account.state ;;
+    drill_fields: [region_type]
   }
   dimension: region_type {
     group_label: "Account"
@@ -177,7 +193,8 @@ view: account {
     label: "Total Delinquencies"
     group_label: "Account"
     description: "Use with Deliquency Threshold paramter to dynamically calculate deliquency rate"
-    type: count
+    type: count_distinct
+    sql: ${account_number} ;;
     filters: [is_delinquent: "Yes"]
     drill_fields: [account_details*]
   }
@@ -252,6 +269,7 @@ view: account {
   dimension: category {
     group_label: "Product"
     sql: ${TABLE}.product.category ;;
+    drill_fields: [rate_type]
   }
 
 ########################PLANNING#################
@@ -279,7 +297,7 @@ view: account {
   ## SETS ##
 
   set: account_details {
-    fields: [account_number, account_status, interest_rate_type, account_balance]
+    fields: [account_number, product_group, group_name, rate_type, account_balance]
   }
 
 }
