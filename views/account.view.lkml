@@ -87,6 +87,7 @@ view: account {
     group_label: "Account"
     type: tier
     tiers: [15,30,45,60,90,120]
+    style: integer
     sql: ${days_delinquent} ;;
   }
 
@@ -140,7 +141,7 @@ view: account {
     sql: ${TABLE}.account.lvr ;;
   }
   measure: total_account_balance {
-    group_label: "Account"
+    # group_label: "Account"
     type: sum
     sql: ${account_balance} ;;
     value_format_name: usd_0
@@ -148,13 +149,13 @@ view: account {
 
   }
   measure: delinquent_90 {
-    group_label: "Account"
+    # group_label: "Account"
     type: count
     filters: [days_delinquent: ">=90"]
   }
   measure: count {
     label: "Total Accounts"
-    group_label: "Account"
+    # group_label: "Account"
     type:count_distinct
     sql: ${account_number} ;;
     drill_fields: [account_details*]
@@ -191,7 +192,7 @@ view: account {
 
   measure: dynamic_delinquent_total {
     label: "Total Delinquencies"
-    group_label: "Account"
+    # group_label: "Account"
     description: "Use with Deliquency Threshold paramter to dynamically calculate deliquency rate"
     type: count_distinct
     sql: ${account_number} ;;
@@ -200,7 +201,7 @@ view: account {
   }
 
   measure: dynamic_delinquency_rate {
-    group_label: "Account"
+    # group_label: "Account"
     description: "Use with Deliquency Threshold paramter to dynamically calculate deliquency rate"
     label_from_parameter: delinquency_threshold
     type:number
