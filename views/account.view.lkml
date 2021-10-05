@@ -120,12 +120,12 @@ view: account {
     group_label: "Account"
     sql: ${TABLE}.primary_security.property_state ;;
     # sql: ${TABLE}.account.state ;;
-    # drill_fields: [region_type]
+    drill_fields: [region_type]
   }
-  # dimension: region_type {
-  #   group_label: "Account"
-  #   sql: ${TABLE}.account.region_type ;;
-  # }
+  dimension: region_type {
+    group_label: "Account"
+    sql: ${TABLE}.primary_security.region ;;
+  }
   # dimension: channel_type {
   #   group_label: "Account"
   #   sql: ${TABLE}.account.channel_type ;;
@@ -210,6 +210,13 @@ view: account {
     sql: 1.0*${dynamic_delinquent_total} / nullif(${count},0) ;;
     value_format_name: percent_2
     drill_fields: [property_state, count, dynamic_delinquency_rate]
+  }
+
+  measure: average_days_delinquent {
+    type:average
+    sql: ${days_delinquent} ;;
+    value_format_name: decimal_0
+    drill_fields: [property_state, count, dynamic_delinquency_rate, average_days_delinquent]
   }
 
 #############PRODUCT##################
