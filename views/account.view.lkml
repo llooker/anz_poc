@@ -78,6 +78,13 @@ view: account {
       }
     }
   }
+  dimension: account_balance_tier {
+    group_label: "Account"
+    type: tier
+    style: integer
+    tiers: [10000,25000,50000,100000,200000]
+    sql: ${account_balance} ;;
+  }
   dimension: days_delinquent {
     group_label: "Account"
     type: number
