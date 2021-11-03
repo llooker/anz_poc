@@ -9,6 +9,15 @@ label: "Capital Markets Risk Reporting"
 
 explore: account {}
 
+### DATAGROUPS ###
+
+datagroup: daily_policy {
+  sql_trigger: select current_date ;;
+  max_cache_age: "24 hours"
+}
+
+persist_with: daily_policy
+
 ### ARCHIVE ###
 
 # explore: account {
