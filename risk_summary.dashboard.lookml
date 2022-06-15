@@ -1,5 +1,5 @@
 - dashboard: 1_capital_markets__risk_summary
-  title: 2) Test Muis
+  title: 1) Capital Markets - Risk Summary
   layout: newspaper
   preferred_viewer: dashboards-next
   crossfilter_enabled: true
