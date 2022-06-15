@@ -1,6 +1,6 @@
 view: account {
   # sql_table_name: anz_poc.wh_denormalised ;;
-  sql_table_name: `anz_poc.wh_denormalised_cleansed_history` ;;
+  sql_table_name: `reg_reporting.wh_denormalised_cleansed_history` ;;
 
 #############CONTROL##################
 
